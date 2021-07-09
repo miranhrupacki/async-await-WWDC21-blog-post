@@ -25,61 +25,59 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
-        
-//        MARK: call this function for first and second example
-//        getTodos()
-        
+//    MARK: call this functions for first example
+//        getTodosFirstExample()
+//    MARK: call this functions for second example
+//        getTodosSecondExample()
 //    MARK: 3. example of async await without Result type
         async {
-            let todos = await self.getTodos()
+            let todos = await getTodosThirdExample()
             guard let todos = todos else { return }
-            self.todos = todos
-            tableView.reloadData()
+            DispatchQueue.main.async {
+                self.todos = todos
+                self.tableView.reloadData()
+            }
         }
     }
     
-//MARK: 1. example with completion handlers
-//    private func getTodos() {
-//        NetworkManager.shared.fetchTodos { [weak self] result in
-//            guard let weakself = self else { return }
-//
-//            switch result {
-//            case .success(let todos):
-//                DispatchQueue.main.async {
-//                    weakself.todos = todos
-//                    weakself.tableView.reloadData()
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-//    }
+//MARK: 1. example -> with completion handlers
+    private func getTodosFirstExample() {
+        NetworkManager.shared.fetchTodosFirstExample { [weak self] result in
+            guard let weakself = self else { return }
+
+            switch result {
+            case .success(let todos):
+                DispatchQueue.main.async {
+                    weakself.todos = todos
+                    weakself.tableView.reloadData()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
+//MARK: 2. example -> async/await with Result type
+    private func getTodosSecondExample() {
+        async {
+            let result = await NetworkManager.shared.fetchTodosSecondExample()
+
+            switch result {
+            case .success(let todos):
+                DispatchQueue.main.async {
+                    self.todos = todos
+                    self.tableView.reloadData()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
-    
-//MARK: 2. example async/await with Result type
-//    private func getTodos() {
-//        async {
-//            let result = await NetworkManager.shared.fetchTodos()
-//
-//            switch result {
-//            case .success(let todos):
-//                DispatchQueue.main.async {
-//                    self.todos = todos
-//                    self.tableView.reloadData()
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-//    }
-    
-    
-    
-//MARK: async/await without Result type
-    private func getTodos() async -> [Todo]? {
+//MARK: 3. example -> async/await without Result type
+    private func getTodosThirdExample() async -> [Todo]? {
         do {
-            let result = try await NetworkManager.shared.fetchTodos()
+            let result = try await NetworkManager.shared.fetchTodosThirdExample()
             return result
         } catch {
             // handle errors
