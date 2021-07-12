@@ -33,10 +33,8 @@ class ViewController: UIViewController {
         async {
             let todos = await getTodosThirdExample()
             guard let todos = todos else { return }
-            DispatchQueue.main.async {
                 self.todos = todos
                 self.tableView.reloadData()
-            }
         }
     }
     
