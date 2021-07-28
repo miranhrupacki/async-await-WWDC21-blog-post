@@ -8,13 +8,15 @@
 import UIKit
 
 
-struct Todo: Codable {
-    let title: String
+struct User: Codable {
+    let name: String
+    let email: String
+    let username: String
 }
 
 class ViewController: UIViewController {
         
-    private var todos = [Todo]()
+    private var users = [User]()
 
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -26,27 +28,27 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         configureTableView()
 //    MARK: call this functions for first example
-//        getTodosFirstExample()
+//        getUsersFirstExample()
 //    MARK: call this functions for second example
-//        getTodosSecondExample()
+//        getUsersSecondExample()
 //    MARK: 3. example of async await without Result type
         async {
-            let todos = await getTodosThirdExample()
-            guard let todos = todos else { return }
-                self.todos = todos
+            let users = await getUsersThirdExample()
+            guard let users = users else { return }
+                self.users = users
                 self.tableView.reloadData()
         }
     }
     
 //MARK: 1. example -> with completion handlers
-    private func getTodosFirstExample() {
-        NetworkManager.shared.fetchTodosFirstExample { [weak self] result in
+    private func getUsersFirstExample() {
+        NetworkManager.shared.fetchUsersFirstExample { [weak self] result in
             guard let weakself = self else { return }
 
             switch result {
-            case .success(let todos):
+            case .success(let users):
                 DispatchQueue.main.async {
-                    weakself.todos = todos
+                    weakself.users = users
                     weakself.tableView.reloadData()
                 }
             case .failure(let error):
@@ -56,14 +58,15 @@ class ViewController: UIViewController {
     }
     
 //MARK: 2. example -> async/await with Result type
-    private func getTodosSecondExample() {
+    
+    private func getUsersSecondExample() {
         async {
-            let result = await NetworkManager.shared.fetchTodosSecondExample()
+            let result = await NetworkManager.shared.fetchUsersSecondExample()
 
             switch result {
-            case .success(let todos):
+            case .success(let users):
                 DispatchQueue.main.async {
-                    self.todos = todos
+                    self.users = users
                     self.tableView.reloadData()
                 }
             case .failure(let error):
@@ -73,9 +76,9 @@ class ViewController: UIViewController {
     }
     
 //MARK: 3. example -> async/await without Result type
-    private func getTodosThirdExample() async -> [Todo]? {
+    private func getUsersThirdExample() async -> [User]? {
         do {
-            let result = try await NetworkManager.shared.fetchTodosThirdExample()
+            let result = try await NetworkManager.shared.fetchUsersThirdExample()
             return result
         } catch {
             // handle errors
@@ -87,17 +90,31 @@ class ViewController: UIViewController {
         view.addSubview(tableView)
         tableView.frame = view.bounds
         tableView.dataSource = self
+        tableView.delegate = self
     }
 }
 
-extension ViewController: UITableViewDataSource {
+extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return todos.count
+        return users.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = "\(indexPath.row + 1). " + todos[indexPath.row].title
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.text =
+        "\(indexPath.row + 1). " +
+        "Name: \(users[indexPath.row].name)" +
+        "\n    username: \(users[indexPath.row].username)" +
+        "\n    email: \(users[indexPath.row].email)"
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
 }

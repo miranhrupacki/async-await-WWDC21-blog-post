@@ -15,19 +15,19 @@ enum NetworkingError: Error {
 }
 
 struct Constants {
-    static let url = "https://jsonplaceholder.typicode.com/todos"
+    static let url = "https://jsonplaceholder.typicode.com/users"
 }
 
 class NetworkManager {
     
     static let shared = NetworkManager()
     
-    // MARK: fetch todos with completion handler
-    func fetchTodosFirstExample(completion: @escaping (Result<[Todo], NetworkingError>) -> Void) {
+    // MARK: fetch users with completion handler
+    func fetchUsersFirstExample(completion: @escaping (Result<[User], NetworkingError>) -> Void) {
 
-        let todosURL = URL(string: Constants.url)
+        let usersURL = URL(string: Constants.url)
 
-        guard let url = todosURL else {
+        guard let url = usersURL else {
             completion(.failure(.invalidURL))
             return
         }
@@ -48,8 +48,8 @@ class NetworkManager {
             }
 
             do {
-                let todos = try JSONDecoder().decode([Todo].self, from: data)
-                completion(.success(todos))
+                let users = try JSONDecoder().decode([User].self, from: data)
+                completion(.success(users))
             } catch {
                 completion(.failure(.invalidData))
             }
@@ -59,19 +59,19 @@ class NetworkManager {
 
     
     
-    //MARK: fetch todos with async/await using Result type
-    func fetchTodosSecondExample() async -> Result<[Todo], NetworkingError> {
-        let todosURL = URL(string: Constants.url)
+    //MARK: fetch users with async/await using Result type
+    func fetchUsersSecondExample() async -> Result<[User], NetworkingError> {
+        let usersURL = URL(string: Constants.url)
         
-        guard let url = todosURL else {
+        guard let url = usersURL else {
             return .failure(.invalidURL)
         }
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            let todos = try JSONDecoder().decode([Todo].self, from: data)
+            let users = try JSONDecoder().decode([User].self, from: data)
             
-            return .success(todos)
+            return .success(users)
         }
         catch {
             return .failure(.invalidData)
@@ -80,12 +80,12 @@ class NetworkManager {
     
     
     
-    //MARK: fetch todos with async/await second example, without Result type
-    func fetchTodosThirdExample() async throws -> [Todo]{
-        let todosURL = URL(string: Constants.url)
-        guard let url = todosURL else { return [] }
+    //MARK: fetch users with async/await second example, without Result type
+    func fetchUsersThirdExample() async throws -> [User]{
+        let usersURL = URL(string: Constants.url)
+        guard let url = usersURL else { return [] }
         let (data, _) = try await URLSession.shared.data(from: url)
-        let todos = try JSONDecoder().decode([Todo].self, from: data)
-        return todos
+        let users = try JSONDecoder().decode([User].self, from: data)
+        return users
     }
 }
